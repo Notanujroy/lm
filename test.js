@@ -4550,7 +4550,7 @@ const userAgents = [
 "WebZIP/3.5 (http://www.spidersoft.com)",
 "Wget/1.9.1",
 "Wget/1.9 cvs-stable (Red Hat modified)",
-"wii libnup/1.0"
+"wii libnup/1.0",
 "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Mobile Safari/537.36",
 "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
 "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Mobile Safari/537.36",
