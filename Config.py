@@ -1,1 +1,20 @@
+import os
 
+ACC_STR01us = ("1AZWarzYBuwgIYV52ELhHRcqqhvFi7_7QfGlwFHSLlpmSPR7uS4ueqd6xIp8lZozi5NAuWUWQe_Tn6vetmAg939VH9l0aMwCIYgeRXNyLzmZVB37LI2d0lhyZHHgDrIA9bKzHsGu0Z4-M5UQayngQcx-e3q33vT_VgzDASAaq2QIUK1lqsD-MgzWR1tmSVhi1BNq_YhyY2N42zutODOUUFQD-csNQTtu_EBgkcyoPHP_FAMV5I_M0wS6WgnphyI7HLGmYYhYU39Wxy9V6jUEeMUsS3xFDsnhJ55_HVKKJDmvE5fI1hw44W_Wf9hU9A9DEGs_DKJEO-bOjm5PGZZpLpVP5AGK3qOI=")
+ACC_STR01 = ("1BVtsOJEBu4IjaCuzT6qybAsBoBeIkIgzeMxnX6vsjvCjKPldtG9hVovfhWl9BYLRDs6vSZbaAG4PTWj6yoUlo88zMMI7oF0uNr6Hgi3Tlqh8EpuC6GTUAM5yeSviZIMmZC4QkFwQFZMHpFxh8aSOFs7SGgYIFXnqPlCDiV3jcgcYEOpK05Q8nhv0U4z5eWUmXgBL9sTP4RrfgO5eV3CCbgxnD-jdXiPZ1WR09G8yrsb61B6lYXhG2J9g91SXmbLntQBB7YkKa-Gy_vOx_CpBtBIyaOAJ8FDwfxd3RNT9GDvgVf1ZVJXGkgU1EkBdBWGqRC3uIHRDmGkSXH3bY4az-XkJACpRBnU=")
+ACC_STRMAIN = ("1BVtsOJEBuwXD_rTorXXsnc_t3Map60ZiaFmaXPNKT5Bxf-b789pWq_ROXFkM5X4wawzD3bu3EFGN2qnflTC4Ao72hdtFMyi60NMxzTfE3H6sjOliFJyTFaHLinzkkQIsi0GPw81x4TPV2QCXYVKfbNdWT7DqD2URJxdJRdHR5Hhdkh4j4iNrKRnmvgXT6_ESHQgwhWBRoEcDyIoM23Hh4aNYvpDvjJsF_Dr08Mzo9Fo2ivXhLMAwoPC_hbj_oIl-8AeD67wg4zwPN4X1el5ODCJgq2xYIB77QY_vtzexHsdWwDyLXOONFR607DTRDxS_NAxFxaEJclaUfVjQa0NGjWne0c84uUU=")
+API_ID = ("22157690")
+API_HASH = ("819a20b5347be3a190163fff29d59d81")
+BIO_MESSAGE = ("Master : @itsmeRood")
+SUDO = [2092103173]
+delay = ("15")
+
+# Get the current script's directory
+script_directory = os.path.dirname(os.path.realpath(__file__))
+
+# Define TMP_DOWNLOAD_DIRECTORY with a default value
+TMP_DOWNLOAD_DIRECTORY = os.path.join(script_directory, "downloads")
+
+# Create the TMP_DOWNLOAD_DIRECTORY if it doesn't exist
+if not os.path.exists(TMP_DOWNLOAD_DIRECTORY):
+    os.makedirs(TMP_DOWNLOAD_DIRECTORY)
