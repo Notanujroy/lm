@@ -3,8 +3,8 @@ import subprocess
 def run_command_on_vps(host, command):
     try:
         # Prompt user for credentials
-        username = ("itsmerood")
-        password = ("@Qwerty123@Rood")
+        username = "itsmerood"
+        password = "@Qwerty123@Rood"
 
         # Construct SSH command
         ssh_command = f'sshpass -p {password} ssh {username}@{host} "{command}"'
@@ -14,9 +14,9 @@ def run_command_on_vps(host, command):
 
         # Print command output and potential errors
         print(f"Output from {host}:")
-        print(result.stdout)
+        print(result.stdout if result.stdout else "No output")
         print("Error (if any):")
-        print(result.stderr)
+        print(result.stderr if result.stderr else "No error")
 
     except Exception as e:
         print(f"Error connecting to {host}: {e}")
