@@ -24,6 +24,7 @@ async def execute_command(command, event):
         await event.respond(f'Changed directory to: {current_directory}')
         return
 
+    print(f'Executing command in directory: {current_directory}')  # Debugging line
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
