@@ -1,5 +1,4 @@
 import asyncio
-import os
 from telethon.sync import TelegramClient, events
 
 # Replace these values with your own
@@ -8,28 +7,17 @@ api_hash = '065c347bfa40c8923faf2650cd934198'
 bot_token = '6336844692:AAF4O08Vu4bj-bF26HXla7xL_fCpvrWg_Oo'
 allowed_users = [2092103173, 765669282]
 
-# Variable to store the running process and current working directory
+# Variable to store the running process
 running_process = None
-current_directory = os.getcwd()
 
 # Function to execute commands asynchronously and send partial responses
 async def execute_command(command, event):
-    global running_process, current_directory
+    global running_process
 
-    # Change the directory if the command starts with '#cd'
-    if command.startswith('#cd '):
-        new_directory = command.split(' ', 1)[1]
-        os.chdir(new_directory)
-        current_directory = os.getcwd()
-        await event.respond(f'Changed directory to: {current_directory}')
-        return
-
-    print(f'Executing command in directory: {current_directory}')  # Debugging line
     process = await asyncio.create_subprocess_shell(
         command,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        cwd=current_directory  # Set the current working directory for the subprocess
+        stderr=asyncio.subprocess.PIPE
     )
 
     running_process = process  # Store the process globally
@@ -51,10 +39,25 @@ async def execute_command(command, event):
 client = TelegramClient('bot_session', api_id, api_hash).start(bot_token=bot_token)
 
 # Event handler for incoming messages
-@client.on(events.NewMessage(pattern=r'#exe (.+)', chats=allowed_users))
+@client.on(events.NewMessage(pattern=r'#(.+)', chats=allowed_users))
 async def handle_command(event):
     command = event.pattern_match.group(1)
     await execute_command(command, event)
+
+# Event handler to stop the ongoing command
+@client.on(events.NewMessage(pattern=r'#stop', chats=allowed_users))
+async def stop_command(event):
+    global running_process
+
+    if running_process:
+        running_process.terminate()  # Terminate the running process
+        await event.respond('Command stopped.')
+        # Fetch and send the remaining output of the command
+        remaining_output, _ = await running_process.communicate()
+        await event.respond(remaining_output.decode())
+        running_process = None  # Reset the global variable after command completes
+    else:
+        await event.respond('No command is currently running.')
 
 # Start the event loop
 client.run_until_disconnected()
