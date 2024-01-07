@@ -25,13 +25,17 @@ vps1_host = '45.58.45.202'
 vps1_username = 'root'
 vps1_password = 'N2vXsbMcAh3Dd6Cx'
 
-vps2_host = 'VPS2_IP_ADDRESS'
-vps2_username = 'YOUR_USERNAME'
-vps2_password = 'YOUR_PASSWORD'
+vps2_host = '20.167.49.217'
+vps2_username = 'itsmerood'
+vps2_password = '@Qwerty123@Rood'
 
-# Replace with the command you want to run on both VPS instances
-command_to_run = 'ls -l'
+while True:
+    # Replace with the command you want to run on both VPS instances
+    command_to_run = input('Enter command (type "exit" to stop): ')
+    
+    if command_to_run.lower() == 'exit':
+        break
 
-# Run the command on both VPS instances
-run_command_on_vps(vps1_host, vps1_username, vps1_password, command_to_run)
-run_command_on_vps(vps2_host, vps2_username, vps2_password, command_to_run)
+    # Run the command on both VPS instances
+    run_command_on_vps(vps1_host, vps1_username, vps1_password, command_to_run)
+    run_command_on_vps(vps2_host, vps2_username, vps2_password, command_to_run)
