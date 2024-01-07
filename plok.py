@@ -30,8 +30,6 @@ telethon_client = TelegramClient('ssh_bot', api_id='26931099', api_hash='065c347
 # Define the command handler for executing commands
 @telethon_client.on(events.NewMessage(pattern='/execute'))
 async def execute_command(event):
-    global user_sessions
-
     user_id = event.message.sender_id
 
     if user_id not in allow_user:
@@ -42,10 +40,9 @@ async def execute_command(event):
 
     try:
         # Get or create a session for the user
-        session = user_sessions.get(user_id, {'current_directory': '/'})
+        user_directory = user_sessions.get(user_id, '/')
         
         # Execute the command on the server
-        user_directory = session['current_directory']
         compound_command = f'bash -c "cd {user_directory} && {command}"'
         stdin, stdout, stderr = client.exec_command(compound_command)
         response = stdout.read().decode()
@@ -54,9 +51,13 @@ async def execute_command(event):
             response += "\nError Output:\n" + stderr.read().decode()
 
         # Update the session state
-        user_sessions[user_id] = {'current_directory': user_directory}
+        user_sessions[user_id] = user_directory
 
         await event.respond(f"Command output:\n{response}")
+
+        # If the command is 'cd', update the user's session directory
+        if command.startswith('cd '):
+            user_sessions[user_id] = command[3:].strip()
 
     except Exception as e:
         await event.respond(f"An error occurred: {str(e)}")
