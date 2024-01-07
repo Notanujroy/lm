@@ -37,8 +37,13 @@ async def execute_command(event):
 
     try:
         # Execute the command on the server
-        stdin, stdout, stderr = client.exec_command(command)
+        compound_command = f'bash -c "cd lm && {command}"'
+        stdin, stdout, stderr = client.exec_command(compound_command)
         response = stdout.read().decode()
+
+        if stderr:
+            response += "\nError Output:\n" + stderr.read().decode()
+
         await event.respond(f"Command output:\n{response}")
 
     except Exception as e:
