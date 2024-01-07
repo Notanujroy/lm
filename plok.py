@@ -43,7 +43,7 @@ async def execute_command(event):
         user_directory = user_sessions.get(user_id, '/')
         
         # Execute the command on the server
-        compound_command = f'bash -c "cd {user_directory} && {command}"'
+        compound_command = f'bash -c "{command}"'
         stdin, stdout, stderr = client.exec_command(compound_command)
         response = stdout.read().decode()
 
