@@ -11,9 +11,6 @@ password = 'N2vXsbMcAh3Dd6Cx'  # Replace with your actual password
 # Telegram bot token
 telegram_bot_token = '6336844692:AAF4O08Vu4bj-bF26HXla7xL_fCpvrWg_Oo'
 
-# Allowed Telegram user IDs
-allow_user = {2092103173, 7226255252}
-
 # Create an SSH client
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -31,13 +28,14 @@ telethon_client = TelegramClient('ssh_bot', api_id='26931099', api_hash='065c347
 @telethon_client.on(events.NewMessage(pattern='/cmd'))
 async def execute_command(event):
     user_id = event.message.sender_id
-
     command = event.message.text[5:]
 
     try:
+        print(f"Received command from user {user_id}: {command}")
+
         # Get or create a session for the user
         user_directory = user_sessions.get(user_id, '/')
-        
+
         # Execute the command on the server
         compound_command = f'cd {user_directory} && {command}'
         stdin, stdout, stderr = client.exec_command(compound_command)
@@ -49,10 +47,14 @@ async def execute_command(event):
         # Update user session directory
         user_sessions[user_id] = user_directory
 
-        await event.respond(f"Command output:\n{response}")
+        log_message = f"Command executed successfully. Output:\n{response}"
+        print(log_message)
+        await event.respond(log_message)
 
     except Exception as e:
-        await event.respond(f"An error occurred: {str(e)}")
+        error_message = f"An error occurred while executing the command: {str(e)}"
+        print(error_message)
+        await event.respond(error_message)
 
 # Start the Telethon client
 telethon_client.start()
